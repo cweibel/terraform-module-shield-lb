@@ -1,10 +1,10 @@
 variable subnet_ids            {}  # The AWS Subnet Id to place the lb into
 variable resource_tags         {}  # AWS tags to apply to resources
 variable vpc_id                {}  # The VPC Id
-variable shield_domain          {}  # url used for shield domain
+variable shield_domain         {}  # url used for shield domain
 variable route53_zone_id       {}  # Route53 zone id
 variable security_groups       {}  # Array of security groups to use
-variable shield_acm_arn         {}  # ACM arn for the shield certificates
+variable shield_acm_arn        {}  # ACM arn for the shield certificates
 variable internal_lb           { default = true } # Determine whether the load balancer is internal-only facing
 
 variable enable_route_53       { default = 1 }  # Disable if using CloudFlare or other DNS
