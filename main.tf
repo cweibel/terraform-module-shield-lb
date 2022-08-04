@@ -32,7 +32,7 @@ resource "aws_lb_target_group" "shield_alb_tg" {
   vpc_id   = var.vpc_id
   tags     = merge({Name = "shield-alb-tg"}, var.resource_tags)
   health_check {
-    path = "/v1/sys/health"
+    path = "/"
     protocol = "HTTPS"
   }
 }
