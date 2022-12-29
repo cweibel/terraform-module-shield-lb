@@ -13,24 +13,24 @@ variable enable_route_53       { default = 1 }  # Disable if using CloudFlare or
 ################################################################################
 # S.H.I.E.L.D. ALB
 ################################################################################
-resource "aws_lb" "shield_alb" {
-  name               = "shield-alb"
+resource "aws_lb" "shield_lb" {
+  name               = "shield-lb"
   internal           = var.internal_lb
   load_balancer_type = "application"
   subnets            = var.subnet_ids
   security_groups    = var.security_groups
-  tags               = merge({Name = "shield-alb"}, var.resource_tags)
+  tags               = merge({Name = "shield-lb"}, var.resource_tags)
 }
 
 ################################################################################
 # S.H.I.E.L.D. ALB Target Group
 ################################################################################
-resource "aws_lb_target_group" "shield_alb_tg" {
-  name     = "shield-alb-tg"
+resource "aws_lb_target_group" "shield_lb_tg" {
+  name     = "shield-lb-tg"
   port     = 443
   protocol = "HTTPS"
   vpc_id   = var.vpc_id
-  tags     = merge({Name = "shield-alb-tg"}, var.resource_tags)
+  tags     = merge({Name = "shield-lb-tg"}, var.resource_tags)
   health_check {
     path = "/"
     protocol = "HTTPS"
@@ -42,17 +42,17 @@ resource "aws_lb_target_group" "shield_alb_tg" {
 ################################################################################
 # S.H.I.E.L.D. ALB Listeners - S.H.I.E.L.D. API - HTTPS
 ################################################################################
-resource "aws_alb_listener" "shield_alb_listener_443" {
-  load_balancer_arn = aws_lb.shield_alb.arn
+resource "aws_alb_listener" "shield_lb_listener_443" {
+  load_balancer_arn = aws_lb.shield_lb.arn
   port = "443"
   protocol = "HTTPS"
   ssl_policy = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn = var.shield_acm_arn
   default_action {
     type = "forward"
-    target_group_arn = aws_lb_target_group.shield_alb_tg.arn
+    target_group_arn = aws_lb_target_group.shield_lb_tg.arn
   }
-  tags = merge({Name = "shield-alb-listener-443"}, var.resource_tags)
+  tags = merge({Name = "shield-lb-listener-443"}, var.resource_tags)
 }
 
 ################################################################################
@@ -65,9 +65,9 @@ resource "aws_route53_record" "shield_alb_record" {
   name    = var.shield_domain
   type    = "CNAME"
   ttl     = "60"
-  records = ["${aws_lb.shield_alb.dns_name}"]
+  records = ["${aws_lb.shield_lb.dns_name}"]
 }
 
-output "dns_name" {value = aws_lb.shield_alb.dns_name}
-output "lb_name"  {value = aws_lb.shield_alb.name }
-output "lb_target_group_name" { value = aws_lb_target_group.shield_alb_tg.name }
+output "dns_name" {value = aws_lb.shield_lb.dns_name}
+output "lb_name"  {value = aws_lb.shield_lb.name }
+output "lb_target_group_name" { value = aws_lb_target_group.shield_lb_tg.name }
